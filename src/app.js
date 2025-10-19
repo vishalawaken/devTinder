@@ -1,23 +1,53 @@
-const express=require("express");
+const express = require("express");
+const { connectDB } = require("./config/database");
+const app = express();
+const User = require("./models/user");
+app.use(express.json());
 
-const app=express();
+// app.post("/signup", async (req, res) => {
+//   const user = new User({
+//     firstName: "Virat",
+//     lastName: "Kohli",
+//     email: "virat@gmail.com",
+//     password: "123456",
+//     age: 30,
+//     gender: "Male",
+//   });
+//   await user.save();
+//   res.send("User created successfully");
+// });
 
-// This will only handle GET call to /user
-app.get("/user",(req,res)=>{
-    res.send("here is the data of the user")
-})
+app.get("/", (req, res) => {
+    console.log("✅ Received GET / request");
+    res.send("Server is working fine");
+  });
 
-app.post("/user",(req,res)=>{
-    console.log("save data to the database")
-    res.send("Data succesfully saved")
-})
+  app.use(express.json());
 
+app.post("/signup", async (req, res) => {
+    console.log(req.body);
+    try {
+      const user = new User(req.body);
+  
+      console.log("⏳ Saving user to DB...");
+      await user.save();
+      console.log("✅ User saved successfully");
+  
+      res.send("User created successfully");
+    } catch (error) {
+      console.error("❌ Error while creating user:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  });
+  
+  connectDB()
+  .then(() => {
+    console.log("✅ Database Connection Established Successfully");
+  })
+  .catch((err) => {
+    console.error("❌ Database connection error:", err);
+  });
 
-app.use("/test",(req,res)=>
-{
-    res.send("Hello from the server")
-});
-
-app.listen(3000,()=>{
-    console.log("succesfully listening on port 3000")
+app.listen(3001, () => {
+  console.log("🚀 Server started on port 3001");
 });
