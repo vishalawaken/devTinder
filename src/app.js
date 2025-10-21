@@ -3,21 +3,10 @@ const { connectDB } = require("./config/database");
 const app = express();
 const User = require("./models/user");
 app.use(express.json());
+const{validateSignUpData}=require("./utils/validation");
+const bcrypt=require("bcrypt");
 
-// app.post("/signup", async (req, res) => {
-//   const user = new User({
-//     firstName: "Virat",
-//     lastName: "Kohli",
-//     email: "virat@gmail.com",
-//     password: "123456",
-//     age: 30,
-//     gender: "Male",
-//   });
-//   await user.save();
-//   res.send("User created successfully");
-// });
 
-// Get user by Email
 app.get("/user", async (req, res) => {
   const userEmail = req.query.emailId; // Use query parameter instead of body
   try {
@@ -46,11 +35,20 @@ app.get("/test", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  console.log("🔥 POST /signup route hit!");
-  console.log("📦 Request body:", req.body);
+    // Validating the data before saving to database
+    try {
+    validateSignUpData(req);
+    const {firstName,lastName,emailId,password}=req.body;
 
-  try {
-    const user = new User(req.body);
+    // Encrypt the password
+    const passwordHash=await bcrypt.hash(password,10);   
+    console.log(passwordHash);     
+
+ 
+    // Creating a new Instance of the User 
+    const user = new User({
+        firstName,lastName,emailId,password:passwordHash
+    });
     console.log("👤 User object created:", user);
 
     console.log("⏳ Saving user to DB...");
