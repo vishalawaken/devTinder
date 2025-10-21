@@ -9,9 +9,11 @@ const userSchema=new mongoose.Schema({
         type:String,
         required:true,
     },
-    email:{
+    emailId:{  
         type:String,
         required:true,
+        unique:true,
+        lowercase:true,
     },
     password:{
         type:String,
@@ -20,9 +22,25 @@ const userSchema=new mongoose.Schema({
         type:Number,
     },
     gender:{
-        type:String
-    }
-});
+        type:String,
+    },
+    photoUrl:{
+        type:String,
+        default:"https://unsplash.com/photos/man-in-black-button-up-shirt-ZHvM3XIOHoE",
+    },
+    about:{
+        type:String,
+        default:"This is a DEFAULT about section",
+    },
+    skills:{
+        type:[String]
+    },
+    
+},
+{
+timestamps:true,
+}
+);
 
 
 module.exports=mongoose.model("User",userSchema);
