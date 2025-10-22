@@ -12,8 +12,8 @@
 
 
 <!-- Connection Request Router -->
-- POST/request/send/interested/:userId
-- POST/request/send/ignored/:userID
+- POST/request/send/status/:userId    - can be either ignored or interested
+- 
 - POST/request/review/accepted/:requestId
 - POST/request/review/rejected/:requestId
 
@@ -22,6 +22,6 @@
 - GET/user/requests/received
 - GET/user/feed - Gets you the profile of other users
 
-STATUS:ignore,interested,accepted,rejected
+STATUS:ignored,interested,accepted,rejected
 
 
