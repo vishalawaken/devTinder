@@ -12,8 +12,11 @@
 
 
 <!-- Connection Request Router -->
-- POST/request/send/status/:userId    - can be either ignored or interested
-- 
+- POST/request/send/:status/:userId    - can be either ignored or interested
+
+
+-  POST/request/review/:status/:requestId - can be either accepted or rejected it is for below cases 
+
 - POST/request/review/accepted/:requestId
 - POST/request/review/rejected/:requestId
 
