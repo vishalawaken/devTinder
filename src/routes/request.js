@@ -6,6 +6,8 @@ const express = require("express");
 
 const requestRouter = express.Router();
 
+
+// Swiping on the profile of the other user
 requestRouter.post(
   "/request/send/:status/:touserId",
   userAuth,

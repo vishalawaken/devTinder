@@ -26,10 +26,14 @@ authRouter.post("/signup", async (req, res) => {
     console.log("👤 User object created:", user);
 
     console.log("⏳ Saving user to DB...");
-    await user.save();
+    const savedUser=await user.save();
+    const token=await savedUser.getJWT();
+    res.cookie("token",token,{
+      expires:new Date(Date.now()+24*60*60*1000),
+    })
     console.log("✅ User saved successfully");
 
-    res.send("User created successfully");
+    res.json({"message":"User created successfully","data":savedUser});
   } catch (error) {
     console.error("❌ Error while creating user:", error);
     res.status(500).send("Internal Server Error: " + error.message);
@@ -52,7 +56,7 @@ authRouter.post("/login", async (req, res) => {
       // Add the Token to the cookie and send the response back to the user
 
       res.cookie("token", token);
-      res.send("User Login Succesfull!!!");
+      res.send(user);
     } else {
       throw new Error("Password is not Correct");
     }

@@ -3,6 +3,8 @@ const { userAuth } = require("../middlewares/auth");
 const ConnectionRequestModel = require("../models/connectionRequest");
 const userRouter = express.Router();
 
+const User = require("../models/user");
+
 // Get all the PeNdning connection request for the logged in User]
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   try {
@@ -76,19 +78,42 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 });
 
 // Get the feed of the logged in user
-userRouter.get("/user/feed",userAuth,async (req,res)=>{
-    try {
-        const loggedInUser=req.user;
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    // User Should see all the userCards
+    // user Should not see his Own Card
+    // User should not see the already made connections card
+    // User should not see the card of the people whom the user ignored
+    // User should not see the card of the person whome the user have already sent the request
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const loggedInUser = req.user;
+    // Find all the     Connection request that i have either send or received to me
+    const connectionRequests = await ConnectionRequestModel.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId status");
 
-        // User Should see all the userCards
-        // user Should not see his Own Card
-        // User should not see the already made connections card
-        // User should not see the card of the people whom the user ignored
-        // User should not see the card of the person whome the user have already sent the request
-        
-    } catch (error) {
-        res.status(400).send("Something went Wrong: " + error.message);
-    }
-})
+    const hideUsersFromTheFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromTheFeed.add(req.fromUserId.toString());
+      hideUsersFromTheFeed.add(req.toUserId.toString());
+    });
+    console.log(hideUsersFromTheFeed);
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromTheFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select("firstName lastName photoUrl about age gender skills")
+      .skip(skip)
+      .limit(limit);
+
+    res.send(users);
+  } catch (error) {
+    res.status(400).send("Something went Wrong: " + error.message);
+  }
+});
 
 module.exports = userRouter;
