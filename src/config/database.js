@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
+  console.log(process.env.DB_CONNECTION_STRING)
   try {
     await mongoose.connect(
-      "mongodb+srv://tsinghvishall_db_user:F8DL8Sbxz1mryR2x@namastenode.7ayuofd.mongodb.net/devTinder?retryWrites=true&w=majority",
+      process.env.DB_CONNECTION_STRING,
      
     );
     console.log("✅ MongoDB connected successfully");
